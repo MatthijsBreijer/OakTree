@@ -5,7 +5,7 @@
          convertWarningsToExceptions="true"
          colors="true">
   <testsuites>
-    <testsuite>
+    <testsuite name="OakTree testsuite">
       <directory>./tests/</directory>
     </testsuite>
   </testsuites>
