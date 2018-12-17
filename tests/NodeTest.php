@@ -12,7 +12,6 @@ class NodeTest extends TestCase
 	 */
 	public function testAddChildAndGetChildren() 
 	{
-		throw new \Exception('lame');
 		$node = new Node;
 		$result = $node
 			->addChild($child1 = new Node)
