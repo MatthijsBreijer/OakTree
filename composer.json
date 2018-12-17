@@ -23,7 +23,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "MatthijsBreijer\\OakTree\\Tests\\": "tests/"
+            "MatthijsBreijer\\Tests\\OakTree\\": "tests/"
         }
     }
 }
