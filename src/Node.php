@@ -157,7 +157,7 @@ class Node implements NodeInterface
 	public function toArray($serializer = null) : array
 	{
 		$node = [
-			'value' => $this->processValue($this->getValue(), $serializer),
+			'value' => static::processValue($this->getValue(), $serializer),
 			'children' => []
 		];
 
@@ -174,7 +174,7 @@ class Node implements NodeInterface
 	 * @param Closure|null $callback
 	 * @return mixed
 	 */
-	private function processValue($value, $closure = null)
+	private static function processValue($value, $closure = null)
 	{
 		if (is_callable($closure)) {
 			$value = $closure($value);
