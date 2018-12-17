@@ -1,212 +1,216 @@
 <?php
-namespace MatthijsBreijer\Tests\OakTree;
+namespace MatthijsBreijer\OakTree;
 
-use MatthijsBreijer\OakTree\Node;
-use PHPUnit\Framework\TestCase;
-
-class NodeTest extends TestCase
+/*
+ * This file is part of OakTree.
+ * @author Matthijs Breijer
+ */
+class Node implements NodeInterface
 {
+	/**
+	 * @var null|NodeInterface
+	 */
+	private $parent = null;
 
 	/**
-	 * @test
+	 * Child nodes
+	 * @var NodeInterface[]
 	 */
-	public function testAddChildAndGetChildren() 
+	private $children = [];
+
+	/**
+	 * @var mixed
+	 */
+	private $value = null;
+
+    /**
+     * {@inheritdoc}
+     */
+	public function __construct($value = null, array $children = [])
 	{
-		$node = new Node;
-		$result = $node
-			->addChild($child1 = new Node)
-			->addChild($child2 = new Node);
+		$this->setValue($value);
+		$this->setChildren($children);
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function addChild(NodeInterface $child, $key = null) : NodeInterface
+	{
+		if (is_null($key)) {
+			$this->children[] = $child;
+		}
+		else {
+			$this->children[$key] = $child;
+		}
 		
-		// assert that $node returns self after adding child
-		$this->assertSame($node, $result);
+		$child->setParent($this);
 
-		// assert children are set on $node
-		$this->assertSame([$child1, $child2], $node->getChildren());
+		return $this;
+	}
 
-		// assert parent is set on added children
-		$this->assertSame($node, $child1->getParent());
-		$this->assertSame($node, $child2->getParent());
+    /**
+     * {@inheritdoc}
+     */
+	public function setParent(NodeInterface $parent = null) : NodeInterface
+	{
+		$this->parent = $parent;
+		return $this;
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function getChildren() : array
+	{
+		return $this->children;
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function getKeys() : array
+	{
+		return array_keys($this->children);
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function setChildren(array $children) : NodeInterface
+	{
+		foreach ($children as $key => $child) {
+			$this->addChild($child, $key);
+		}
+
+		return $this;
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function getParent()
+	{
+		return $this->parent;
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function setValue($value) : NodeInterface
+	{
+		$this->value = $value;
+		return $this;
+	}
+
+    /**
+     * {@inheritdoc}
+     */
+	public function getValue() 
+	{
+		return $this->value;
 	}
 
 	/**
-	 * @test
+	 * {@inheritdoc}
 	 */
-	public function testSetAndGetChildren() 
+	public function removeChild(NodeInterface $remove) : NodeInterface
 	{
-		$node = new Node;
-		$child1 = new Node('1');
-		$child2 = new Node('2');
-		$children = [
-				0 => $child1, 
-				'a' => $child2, 
-			];
+        foreach ($this->children as $key => $child) {
+            if ($child == $remove) {
+                unset($this->children[$key]);
+                $child->setParent(null);
+                break;
+            }
+        }
 
-		$node->setChildren($children);
-		$this->assertSame($children, $node->getChildren());
-
-		$this->assertSame($node, $child1->getParent());
-		$this->assertSame($node, $child2->getParent());
+        return $this;
 	}
 
 	/**
-	 * @test
+	 * {@inheritdoc}
 	 */
-	public function testGetAndSetParent()
+	public function isChild() : bool
 	{
-		$node = new Node;
-		$child = new Node;
-		$child->setParent($node);
-		
-		$this->assertSame($node, $child->getParent());
+		return !$this->isRoot();
 	}
 
 	/**
-	 * @test
+	 * {@inheritdoc}
 	 */
-	public function testSetAndGetValue()
+	public function isRoot() : bool
 	{
-		$node = new Node;
-		$value = 'testing';
-		
-		$node->setValue($value);
-		$this->assertSame($value, $node->getValue());
+		return is_null($this->getParent());
+	}
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isLeaf() : bool
+    {
+        return count($this->children) === 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+	public function toArray($serializer = null) : array
+	{
+		$node = [
+			'value' => static::processValue($this->getValue(), $serializer),
+			'children' => []
+		];
+
+		foreach ($this->children as $key => $childNode) {
+			$node['children'][$key] = $childNode->toArray($serializer);
+		}
+
+		return $node;
 	}
 
 	/**
-	 * @test
-	 */
-	public function testRemoveChild()
-	{
-		$tree = (new Node)
-			->addChild($child1 = new Node)
-			->addChild($child2 = new Node);
-
-		$this->assertcount(2, $tree->getChildren());
-
-		$tree->removeChild($child1);
-
-		$this->assertCount(1, $tree->getChildren());
-	}
-
-	/**
-	 * @test
-	 */
-	public function testIsChild()
-	{
-		$tree = (new Node)
-			->addChild($child = new Node);
-
-		$this->assertTrue($child->isChild());
-		$this->assertFalse($tree->isChild());
-	}
-
-	/**
-	 * @test
-	 */
-	public function testIsRoot()
-	{
-		$tree = (new Node)
-			->addChild($child = new Node);
-
-		$this->assertTrue($tree->isRoot());
-		$this->assertFalse($child->isRoot());
-	}	
-
-	/**
-	 * @test
-	 */
-	public function testIsLeaf()
-	{
-		$tree = (new Node)
-			->addChild($child = new Node);
-
-		$this->assertTrue($child->isLeaf());
-		$this->assertFalse($tree->isLeaf());
-	}	
-
-	/**
-	 * @test
-	 * @dataProvider constructorArguments
+	 * (un)serialize value if Closure is passed
 	 * @param mixed $value
-	 * @param NodeInterface[] $children
+	 * @param Closure|null $callback
+	 * @return mixed
 	 */
-	public function testConstructor($value, $children)
+	private static function processValue($value, $closure = null)
 	{
-		$node = new Node($value, $children);
+		if (is_callable($closure)) {
+			$value = $closure($value);
+		}
 
-		$this->assertSame($value, $node->getValue());
-		$this->assertSame($children, $node->getChildren());
-	}	
-
-	/**
-	 * Provides testdata for testConstructor()
-	 */
-	public function constructorArguments()
-	{
-		return [
-			[null, []],
-			[null, [new Node]],
-			['abc', ['key' => new Node]],
-			['def', []]
-		];
+		return $value;
 	}
 
-	/**
-	 * @test
-	 */
-	public function testToArrayAndFromArray()
+    /**
+     * {@inheritdoc}
+     */
+	public static function fromArray(array $array, $unserializer = null) : NodeInterface
 	{
-		$tree = (new Node)
-			->addChild(new Node);
-		
-		$array = [
-			'value' => null,
-			'children' => [ 0 => ['value' => null, 'children' => []] ]
-		];
-		
-		$this->assertSame($array, $tree->toArray());
-		$this->assertEquals($tree, Node::fromArray($array));
+		$node = new Node(static::processValue($array['value'], $unserializer));
+
+		foreach ($array['children'] as $key => $child) {
+			$node->addChild(static::fromArray($child, $unserializer), $key);
+		}
+
+		return $node;
 	}
 
-	/**
-	 * @test
-	 */
-	public function testToArrayAndFromArrayWithCustomKey()
+    /**
+     * {@inheritdoc}
+     */
+	public function jsonSerialize() : array
 	{
-		$tree = (new Node('root'))
-			->addChild(new Node, 'custom');
-		
-		$array = [
-			'value' => 'root',
-			'children' => [ 
-				'custom' => ['value' => null, 'children' => []] 
-			]
-		];
-
-		$this->assertSame($array, $tree->toArray());
-		$this->assertEquals($tree, Node::fromArray($array));
+		return $this->toArray();
 	}
 
-	/**
-	 * @test
-	 */
-	public function testToArrayAndFromArrayWithSerializer()
-	{
-		$tree = (new Node('root'))
-			->addChild(new Node(new \StdClass));
-		
-		$serializer = function($value) { return serialize($value); };
-		$unserializer = function($value) { return unserialize($value); };
-
-		$array = [
-			'value' => $serializer('root'),
-			'children' => [ 
-				0 => ['value' => $serializer(new \StdClass), 'children' => []] 
-			]
-		];
-
-		$this->assertSame($array, $tree->toArray($serializer));
-		$this->assertEquals($tree, Node::fromArray($array, $unserializer));
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function accept(Visitor $visitor)
+    {
+        return $visitor->visit($this);
+    }
 
 }
