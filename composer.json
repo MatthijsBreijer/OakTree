@@ -1,0 +1,29 @@
+{
+    "name": "matthijsbreijer/oaktree",
+    "type": "library",
+    "description": "",
+    "keywords": [],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matthijs Breijer",
+            "email": "breijer.matthijs@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "MatthijsBreijer\\OakTree\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MatthijsBreijer\\OakTree\\Tests\\": "tests/"
+        }
+    }
+}
