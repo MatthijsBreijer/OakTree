@@ -34,7 +34,7 @@ interface NodeInterface extends \JsonSerializable
      * Get keys of the child nodes
      * @return mixed[]
      */
-    public function getKeys() : array;
+    public function getChildrenKeys() : array;
 
     /**
      * Set the children of a Node, array keys are kept within the tree

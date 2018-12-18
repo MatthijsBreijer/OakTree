@@ -44,8 +44,21 @@ class NodeTest extends TestCase
 		$node->setChildren($children);
 		$this->assertSame($children, $node->getChildren());
 
+		// setChilren() should automatically set parent node
 		$this->assertSame($node, $child1->getParent());
 		$this->assertSame($node, $child2->getParent());
+	}
+
+	/**
+	 * @test
+	 */
+	public function testGetChildrenKeys()
+	{
+                $node = (new Node)
+			->addChild(new Node, 0)
+			->addChild(new Node, 'a');
+
+		$this->assertSame([0, 'a'], $node->getChildrenKeys());
 	}
 
 	/**
@@ -166,6 +179,9 @@ class NodeTest extends TestCase
 		
 		$this->assertSame($array, $tree->toArray());
 		$this->assertEquals($tree, Node::fromArray($array));
+
+		// JSONSerialize should do the same as toArray()
+		$this->assertSame($array, $tree->jsonSerialize());
 	}
 
 	/**
@@ -185,6 +201,9 @@ class NodeTest extends TestCase
 
 		$this->assertSame($array, $tree->toArray());
 		$this->assertEquals($tree, Node::fromArray($array));
+
+                // JSONSerialize should do the same as toArray()
+                $this->assertSame($array, $tree->jsonSerialize());
 	}
 
 	/**

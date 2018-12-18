@@ -69,7 +69,7 @@ class Node implements NodeInterface
     /**
      * {@inheritdoc}
      */
-	public function getKeys() : array
+	public function getChildrenKeys() : array
 	{
 		return array_keys($this->children);
 	}
