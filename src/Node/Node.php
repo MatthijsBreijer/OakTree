@@ -1,6 +1,7 @@
 <?php
-namespace MatthijsBreijer\OakTree;
+namespace MatthijsBreijer\OakTree\Node;
 
+use MatthijsBreijer\OakTree\Visitor\VisitorInterface;
 /*
  * This file is part of OakTree.
  * @author Matthijs Breijer
@@ -208,7 +209,7 @@ class Node implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public function accept(Visitor $visitor)
+    public function accept(VisitorInterface $visitor)
     {
         return $visitor->visit($this);
     }

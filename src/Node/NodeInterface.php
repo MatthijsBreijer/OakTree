@@ -1,5 +1,7 @@
 <?php
-namespace MatthijsBreijer\OakTree;
+namespace MatthijsBreijer\OakTree\Node;
+
+use MatthijsBreijer\OakTree\Visitor\VisitorInterface;
 
 interface NodeInterface extends \JsonSerializable
 {

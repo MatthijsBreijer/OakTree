@@ -1,7 +1,8 @@
 <?php
-namespace MatthijsBreijer\Tests\OakTree;
+namespace MatthijsBreijer\Tests\OakTree\Node;
 
-use MatthijsBreijer\OakTree\Node;
+use MatthijsBreijer\OakTree\Node\Node;
+use MatthijsBreijer\OakTree\Visitor\VisitorInterface;
 use PHPUnit\Framework\TestCase;
 
 class NodeTest extends TestCase
@@ -17,13 +18,22 @@ class NodeTest extends TestCase
             ->addChild($child1 = new Node)
             ->addChild($child2 = new Node);
         
-        // assert that $node returns self after adding child
-        $this->assertSame($node, $result);
-
-        // assert children are set on $node
         $this->assertSame([$child1, $child2], $node->getChildren());
 
-        // assert parent is set on added children
+        // assert that $node returns self after adding child
+        //$this->assertSame($node, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function testAddChildSetsParent()
+    {
+        $node = new Node;
+        $result = $node
+            ->addChild($child1 = new Node)
+            ->addChild($child2 = new Node);
+
         $this->assertSame($node, $child1->getParent());
         $this->assertSame($node, $child2->getParent());
     }
@@ -33,18 +43,26 @@ class NodeTest extends TestCase
      */
     public function testSetAndGetChildren() 
     {
+        $node = (new Node)
+            ->addChild($child1 = new Node, 0)
+            ->addChild($child2 = new Node, 'a');
+
+        $node->setChildren($children = [0 => $child1, 'a' => $child2]);
+
+        $this->assertSame($children, $node->getChildren());
+    }
+
+    /**
+     * @test
+     */
+    public function testSetChildrenSetsParent()
+    {
         $node = new Node;
         $child1 = new Node('1');
         $child2 = new Node('2');
-        $children = [
-                0 => $child1, 
-                'a' => $child2, 
-            ];
 
-        $node->setChildren($children);
-        $this->assertSame($children, $node->getChildren());
+        $node->setChildren([0 => $child1, 'a' => $child2]);
 
-        // setChilren() should automatically set parent node
         $this->assertSame($node, $child1->getParent());
         $this->assertSame($node, $child2->getParent());
     }
@@ -54,7 +72,7 @@ class NodeTest extends TestCase
      */
     public function testGetChildrenKeys()
     {
-                $node = (new Node)
+        $node = (new Node)
             ->addChild(new Node, 0)
             ->addChild(new Node, 'a');
 
@@ -202,8 +220,8 @@ class NodeTest extends TestCase
         $this->assertSame($array, $tree->toArray());
         $this->assertEquals($tree, Node::fromArray($array));
 
-                // JSONSerialize should do the same as toArray()
-                $this->assertSame($array, $tree->jsonSerialize());
+        // JSONSerialize should do the same as toArray()
+        $this->assertSame($array, $tree->jsonSerialize());
     }
 
     /**
@@ -226,6 +244,21 @@ class NodeTest extends TestCase
 
         $this->assertSame($array, $tree->toArray($serializer));
         $this->assertEquals($tree, Node::fromArray($array, $unserializer));
+    }
+
+    /**
+     * @test
+     */
+    public function testNodeShouldAcceptVisitor()
+    {
+        $node = new Node;
+
+        $visitor = $this->createMock(VisitorInterface::class);
+        $visitor->expects($this->once())
+            ->method('visit')
+            ->with($this->equalto($node));
+
+        $node->accept($visitor);
     }
 
 }
