@@ -71,6 +71,12 @@ interface NodeInterface extends \JsonSerializable
     public function removeChild(NodeInterface $child) : NodeInterface;
 
     /**
+     * Remove a Node from a tree and return the removed Node instance
+     * @return NodeInterface
+     */
+    public function pop() : NodeInterface;
+
+    /**
      * Is Node a child of another node?
      * @return boolean
      */
@@ -109,4 +115,11 @@ interface NodeInterface extends \JsonSerializable
      * @return array
      */
     public function jsonSerialize() : array;
+
+    /**
+     * Alter the tree with a Visitor
+     * @param MatthijsBreijer\OakTree\Visitor\VisitorInterface
+     */
+    public function accept(VisitorInterface $visitor);
+
 }

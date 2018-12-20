@@ -19,9 +19,6 @@ class NodeTest extends TestCase
             ->addChild($child2 = new Node);
         
         $this->assertSame([$child1, $child2], $node->getChildren());
-
-        // assert that $node returns self after adding child
-        //$this->assertSame($node, $result);
     }
 
     /**
@@ -117,6 +114,59 @@ class NodeTest extends TestCase
         $tree->removeChild($child1);
 
         $this->assertCount(1, $tree->getChildren());
+        $this->assertNull($child1->getParent());
+    }
+
+    /**
+     * @test
+     */
+    public function testPopRootReturnsRoot()
+    {
+        $root = (new Node('root'))
+            ->addChild(new Node('A'));
+
+        $this->assertSame($root, $root->pop());
+    }
+
+    /**
+     * @test
+     */
+    public function testPopSubTreeReturnsSubTree()
+    {
+        $root = (new Node('root'))
+            ->addChild($A = new Node('A'));
+        
+        $A->addChild($B = new Node('B'));
+
+        $this->assertSame($A, $A->pop());
+    }
+
+    /**
+     * @test
+     */
+    public function testPopSubTreeRemovesParent()
+    {
+        $root = (new Node('root'))
+            ->addChild($A = new Node('A'));
+
+        $A->addChild($B = new Node('B'));
+
+        $this->assertNull($A->pop()->getParent());
+    }
+
+    /**
+     * @test
+     */
+    public function testPopSubTreeIsRemovedFromRoot()
+    {
+        $root = (new Node('root'))
+            ->addChild($A = new Node('A'));
+
+        $A->addChild($B = new Node('B'));
+        
+        $A->pop();
+
+        $this->assertCount(0, $root->getChildren());
     }
 
     /**
@@ -261,4 +311,19 @@ class NodeTest extends TestCase
         $node->accept($visitor);
     }
 
+    /**
+     * @test
+     */
+    public function testFluency()
+    {
+	$node = new Node('node');
+        $parent = new Node('parent');
+        $child = new Node('child');
+
+        $this->assertSame($node, $node->addChild($child));
+        $this->assertSame($node, $node->setParent($parent));
+        $this->assertSame($node, $node->setValue('value'));
+        $this->assertSame($node, $node->removeChild($child));
+
+    }
 }

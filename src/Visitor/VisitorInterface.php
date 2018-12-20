@@ -7,7 +7,7 @@ interface VisitorInterface
 {
     /**
      * @param NodeInterface $node
-     * @return mixed
+     * @return NodeInterface|null
      */
     public function visit(NodeInterface $node);
 }

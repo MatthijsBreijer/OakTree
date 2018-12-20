@@ -127,6 +127,19 @@ class Node implements NodeInterface
 
         return $this;
     }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function pop() : NodeInterface
+    {
+        $parent = $this->getParent();
+        if (!is_null($parent)) {
+            $parent->removeChild($this);
+        }
+
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
