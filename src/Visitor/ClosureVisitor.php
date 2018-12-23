@@ -14,6 +14,9 @@ class ClosureVisitor implements VisitorInterface
      */
     private $closure;
 
+    /**
+     * @param \Closure $closure
+     */
     public function __construct(\Closure $closure)
     {
         $this->closure = $closure;
@@ -27,8 +30,8 @@ class ClosureVisitor implements VisitorInterface
         // Can not call Closure directly from instance property
         $closure = $this->closure;
 
-        // A callback cannot self-reference the visitor.
-        // We  pass it to closure here for recursive operations
+        // A Closure cannot self-reference the visitor.
+        // We  pass it to Closure here for recursive operations
 	return $closure($node, $this);
     }
 }

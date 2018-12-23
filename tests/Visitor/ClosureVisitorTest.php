@@ -12,7 +12,6 @@ class ClosureVisitorTest extends TestCase
      */
     private $closureCalls = 0;
 
-
     /**
      * @var MatthijsBreijer\OakTree\Visitor\ClosureVisitor
      */

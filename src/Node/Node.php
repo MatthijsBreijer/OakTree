@@ -2,10 +2,7 @@
 namespace MatthijsBreijer\OakTree\Node;
 
 use MatthijsBreijer\OakTree\Visitor\VisitorInterface;
-/*
- * This file is part of OakTree.
- * @author Matthijs Breijer
- */
+
 class Node implements NodeInterface
 {
     /**
@@ -154,7 +151,7 @@ class Node implements NodeInterface
      */
     public function isRoot() : bool
     {
-        return is_null($this->getParent());
+        return is_null($this->parent);
     }
 
     /**
