@@ -75,10 +75,36 @@ class Node implements NodeInterface
     /**
      * {@inheritdoc}
      */
+    public function getChildByKey($key)
+    {
+        if (!array_key_exists($key, $this->children)) {
+	    throw new \OutOfBoundsException('Key `' . $key . '` does not exist');
+
+        }
+
+        return $this->children[$key];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setChildren(array $children) : NodeInterface
     {
+        $this->removeAllChildren();
         foreach ($children as $key => $child) {
             $this->addChild($child, $key);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeAllChildren() : NodeInterface
+    {
+        foreach ($this->children as $child) {
+            $this->removeChild($child);
         }
 
         return $this;
@@ -90,6 +116,21 @@ class Node implements NodeInterface
     public function getParent()
     {
         return $this->parent;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoot() : NodeInterface
+    {
+        $root = $this;
+        $node = $this;
+
+        while( !is_null($node = $node->getParent()) ) {
+            $root = $node;
+        }
+
+        return $root;
     }
 
     /**
@@ -115,7 +156,7 @@ class Node implements NodeInterface
     public function removeChild(NodeInterface $remove) : NodeInterface
     {
         foreach ($this->children as $key => $child) {
-            if ($child == $remove) {
+            if ($child === $remove) {
                 unset($this->children[$key]);
                 $child->setParent(null);
                 break;
@@ -165,7 +206,7 @@ class Node implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public function toArray($serializer = null) : array
+    public function toArray(\Closure $serializer = null) : array
     {
         $node = [
             'value' => static::processValue($this->getValue(), $serializer),
@@ -185,7 +226,7 @@ class Node implements NodeInterface
      * @param Closure|null $callback
      * @return mixed
      */
-    private static function processValue($value, $closure = null)
+    private static function processValue($value, \Closure $closure = null)
     {
         if (is_callable($closure)) {
             $value = $closure($value);
@@ -197,7 +238,7 @@ class Node implements NodeInterface
     /**
      * {@inheritdoc}
      */
-    public static function fromArray(array $array, $unserializer = null) : NodeInterface
+    public static function fromArray(array $array, \Closure $unserializer = null) : NodeInterface
     {
         $node = new Node(static::processValue($array['value'], $unserializer));
 

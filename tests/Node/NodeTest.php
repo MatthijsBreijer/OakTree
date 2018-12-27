@@ -79,6 +79,35 @@ class NodeTest extends TestCase
     /**
      * @test
      */
+    public function testGetChildByKeyReturnsNode()
+    {
+        $key = 'key';
+
+        $node = (new Node)
+            ->addChild($child1 = new Node('child1'), $key);
+
+        $this->assertSame($child1, $node->getChildByKey($key));
+    }
+
+    /**
+     * @test
+     */
+    public function testGetChildByKeyThrowsExceptionWhenKeyDoesNotExist()
+    {
+        $key = 'key';
+        $expectedException = 'Key `' . $key . '` does not exist';
+
+        $root = (new Node('root'))
+            ->addChild(new Node('child'), 'notTheKeyWereLookingFor');
+
+        $this->expectException(\OutOfBoundsException::class, $expectedException);
+        $root->getChildByKey($key);
+    }
+
+
+    /**
+     * @test
+     */
     public function testGetAndSetParent()
     {
         $node = new Node;
@@ -103,13 +132,31 @@ class NodeTest extends TestCase
     /**
      * @test
      */
+    public function testGetRoot()
+    {
+        $root = (new Node('root'))
+            ->addChild($child1 = new Node('child1'))
+            ->addChild($child2 = new Node('child2'));
+
+        $grandChild1 = new Node('grandChild1');
+        $child2->addChild($grandChild1);
+
+        $this->assertSame($root, $root->getRoot());
+        $this->assertSame($root, $child1->getRoot());
+        $this->assertSame($root, $child2->getRoot());
+        $this->assertSame($root, $grandChild1->getRoot());
+    }
+
+    /**
+     * @test
+     */
     public function testRemoveChild()
     {
         $tree = (new Node)
             ->addChild($child1 = new Node)
             ->addChild($child2 = new Node);
 
-        $this->assertcount(2, $tree->getChildren());
+        $this->assertCount(2, $tree->getChildren());
 
         $tree->removeChild($child1);
 
@@ -117,6 +164,20 @@ class NodeTest extends TestCase
         $this->assertNull($child1->getParent());
     }
 
+    /**
+     * @test
+     */
+    public function testRemoveAllChildren() {
+        $tree = (new Node)
+            ->addChild($child1 = new Node)
+            ->addChild($child2 = new Node);
+
+        $this->assertCount(2, $tree->getChildren());
+
+        $tree->removeAllChildren();
+
+        $this->assertCount(0, $tree->getChildren());
+    }
     /**
      * @test
      */
@@ -324,6 +385,7 @@ class NodeTest extends TestCase
         $this->assertSame($node, $node->setParent($parent));
         $this->assertSame($node, $node->setValue('value'));
         $this->assertSame($node, $node->removeChild($child));
-
+        $this->assertSame($node, $node->removeAllChildren());
+        $this->assertSame($node, $node->setChildren([$child]));
     }
 }

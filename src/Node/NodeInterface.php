@@ -39,6 +39,14 @@ interface NodeInterface extends \JsonSerializable
     public function getChildrenKeys() : array;
 
     /**
+     * Get the child Node by array key
+     * @param mixed $key
+     * @return NodeInterface|null
+     * @throws \OutOfBoundsException
+     */
+    public function getChildByKey($key);
+
+    /**
      * Set the children of a Node, array keys are kept within the tree
      * @param NodeInterface[] $children
      * @return NodeInterface The Node children are added to for fluency
@@ -46,10 +54,22 @@ interface NodeInterface extends \JsonSerializable
     public function setChildren(array $children) : NodeInterface;
 
     /**
+     * Remove all child Nodes from current Node
+     * @return NodeInterface
+     */
+    public function removeAllChildren() : NodeInterface;
+
+    /**
      * Get parent of a Node
      * @return null|NodeInterface
      */
     public function getParent();
+
+    /**
+     * Get the root node of a tree
+     * @return NodeInterface
+     */
+    public function getRoot() : NodeInterface;
 
     /**
      * Set the value stored in the Node
@@ -99,7 +119,7 @@ interface NodeInterface extends \JsonSerializable
      * @param Closure|null $serializer optional callback to serialize Node value
      * @return array
      */
-    public function toArray($serializer = null) : array;
+    public function toArray(\Closure $serializer = null) : array;
 
     /**
      * Convert array structure to Node(s)
@@ -107,7 +127,7 @@ interface NodeInterface extends \JsonSerializable
      * @param Closure|null $unserializer optional callback to unserialize Node value
      * @return NodeInterface
      */
-    public static function fromArray(array $array, $unserializer = null) : NodeInterface;
+    public static function fromArray(array $array, \Closure $unserializer = null) : NodeInterface;
 
     /**
      * Convert data structure (including children) to array
