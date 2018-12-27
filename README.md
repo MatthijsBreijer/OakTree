@@ -152,7 +152,7 @@ $closure = function(NodeInterface $node, VisitorInterface $visitor) {
     $return = $node->isLeaf() ? [$node] : [];
 
     foreach ($node->getChildren() as $key => $child) {
-        $return = array_merge($return, $child->accept($this));
+        $return = array_merge($return, $child->accept($visitor));
     }
 
     return $return;
