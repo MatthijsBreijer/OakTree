@@ -1,5 +1,5 @@
 # OakTree
-[![Build Status](https://travis-ci.org/MatthijsBreijer/OakTree.svg?branch=master)](https://travis-ci.org/MatthijsBreijer/OakTree) 
+[![Build Status](https://travis-ci.org/MatthijsBreijer/OakTree.svg?branch=master)](https://travis-ci.org/MatthijsBreijer/OakTree)
 [![codecov](https://codecov.io/gh/matthijsbreijer/oaktree/branch/master/graph/badge.svg)](https://codecov.io/gh/MatthijsBreijer/OakTree)
 
 **A tree data structure implementation with support for key-based traversal and custom (un)serialization. Useful implementations could include product trees, file/folder structures, routing trees and a lot more. As a package its written from scratch, mostly derived from [nicmart/Tree](https://github.com/nicmart/Tree)**
@@ -11,7 +11,7 @@ A Node can be passed any type of value during instantiation.
 ```php
 use MatthijsBreijer\OakTree\Node;
 
-$node = new Node('data'); 
+$node = new Node('data');
 ```
 ### Getting and setting values
 A node value can be retrieved and altered using `Node::getValue()` and `Node::setValue()`. Note that `Node::setValue()` is fluent and can be daisy-chained.
@@ -86,7 +86,7 @@ $child1 = $node->getChildByKey(0)->pop();
 var_dump($node->getChildren()); // array(1) [1 => $child2]
 ```
 ### Set children
-*Please note that this method removes previously present children.* `Node::setChildren()` sets a (new) array of children Nodes. This method is fluent and can be daisy-chained. 
+*Please note that this method removes previously present children.* `Node::setChildren()` sets a (new) array of children Nodes. This method is fluent and can be daisy-chained.
 ```php
 $node->setChildren([new Node('a'), new Node('b')]);
 
@@ -122,7 +122,7 @@ A root Node has no parent.
 $node->isRoot(); // bool(true)
 ```
 ## Tree alterations
-OakTree uses the [Visitor Pattern](https://sourcemaking.com/design_patterns/visitor) to iterate over a tree. The visitor contains the logic to apply on the Nodes in the tree. Visitors should implement the Visitor interface `MatthijsBreijer\OakTree\Visitor\VisitorInterface`. Visitors return mixed content depending on their purpose.
+OakTree uses the [Visitor Pattern](https://sourcemaking.com/design_patterns/visitor) to iterate over a tree. The visitor contains the logic to apply on the Nodes in the tree. Visitors must implement the Visitor interface `MatthijsBreijer\OakTree\Visitor\VisitorInterface`. Visitors return mixed content depending on their purpose.
 
 ### LeafVisitor
 The `LeafVisitor` returns an array of leaves of a tree (`$node`'s where `Node::isLeaf()` returns true).
@@ -164,9 +164,9 @@ $leafs = $tree->accept($visitor); // array(2) [$child1, $child2]
 ```
 
 ## Serialization / Unserialization
-OakTree Nodes have a `Node::toArray()` and `Node::fromArray()` method to allow customized (un)serialization of a tree. This can be used to cache data, to quickly pass around information from the tree to an API or vice versa.  The nodes also implement PHP's `\JsonSerializable` interface. 
+OakTree Nodes have a `Node::toArray()` and `Node::fromArray()` method to allow customized (un)serialization of a tree. This can be used to cache data, to quickly pass around information from the tree to an API or vice versa.  The nodes also implement PHP's `\JsonSerializable` interface.
 
-### Basic serialization
+### Basic tree to array conversion
 ```php
 // Expose product catalog to a view
 $product = new Node('Product 1');
@@ -176,31 +176,29 @@ $option2 = new Node('Extended package option 2');
 $product->addChild($option1)
     ->addChild($option2);
 
-// Both examples below have the same JSON encoded result
 // array(2) [
-//     'value' => 'Product 1', 
+//     'value' => 'Product 1',
 //     'children' => array(2) [
 //         array(3) [
-//             'value' => 'Extended package option 1', 
+//             'value' => 'Extended package option 1',
 //             'children' => []
 //         ],
 //         array(3) [
-//             'value' => 'Extended package option 2', 
+//             'value' => 'Extended package option 2',
 //             'children' => []
 //         ]
 //     ]
 // ]
-$json = json_encode($product);
-$json = json_encode( $product->toArray() );
+$array = $product->toArray();
 ```
-### Basic unserialization
-Using the above example the JSON result `$json` can be converted back to a tree as follows.
+### Basic array to tree conversion
+Using the above example the array result `$array` can be converted back to a tree as follows.
 ```php
-$tree = Node::fromArray( json_decode($json) );
+$tree = Node::fromArray($array);
 ```
 
-### Closure based serialization
-
+### Closure based tree to array conversion
+The `Node::toArray()` method accepts a second argument for `\Closure`-based conversion to an array, which in turn can be serialized. 
 ```php
 // Build a fictive product catalog tree
 $product = new Node( new Product('Product 1') );
@@ -217,10 +215,9 @@ $closure = function($nodeValue) {
     ];
 };
 
-// Both examples below have the same JSON encoded result
 // array(2) [
 //     'value' => array(2) [
-//         'name' => 'Product 1', 
+//         'name' => 'Product 1',
 //         'type' => 'Product'
 //     ],
 //     'children' => array(2) [
@@ -240,10 +237,10 @@ $closure = function($nodeValue) {
 //         ]
 //     ]
 // ]
-$json = $product->toArray($closure);
+$array = $product->toArray($closure);
 ```
-### Closure based unserialization
-Using the above example the JSON result `$json` can be converted back to a tree as follows.
+### Closure based array to tree conversion
+Using the `$array` variable created in previous example the array result can be converted back to a tree as follows.
 ```php
 $closure = function($value) {
     $type = $value['type'];
@@ -251,8 +248,22 @@ $closure = function($value) {
     return new $type($name);
 };
 
-$tree = Node::fromArray(json_decode($json), $closure);
+$tree = Node::fromArray($array, $closure);
 ```
 
+# Installation
 
+## Composer
+OakTree can be installed using the PHP Composer package manager using the following command:
+
+```bash
+composer require matthijsbreijer/oaktree
+```
+
+## Running tests
+
+```bash
+cd vendor/matthijsbreijer/oaktree/tests
+phpunit
+```
 
